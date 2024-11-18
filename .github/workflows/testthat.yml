@@ -40,7 +40,7 @@ jobs:
       run: |
         Rscript -e "install.packages('renv', repos = 'https://cran.rstudio.com/')"
 
-    # Restore renv environment
+    # Restore renv environment using lockfile
     - name: Restore renv environment
       run: |
         Rscript -e "renv::restore()"
