@@ -10,7 +10,7 @@ config_load <- function() {
 
     # user_config_file is used by users to replace or supplement default configuration
     user_config_file <- here::here("config.yml") 
-    if (file.exists(user_config_file)) { # optional
+    if (file.exists(user_config_file)) { # optionally load the user config_file
       load_vars(user_config_file)
     }
   } else {
@@ -20,7 +20,7 @@ config_load <- function() {
 
 load_vars <- function(config_file_path) {
   # Load the YAML file
-  config <- yaml.load_file(config_file)
+  config <- yaml.load_file(config_file_path)
 
   # Set environment variables
   set_env_vars <- function(config_list, prefix = "") {
