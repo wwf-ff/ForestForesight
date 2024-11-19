@@ -2,7 +2,7 @@ URL_MARKDOWN: "https://raw.githubusercontent.com/jduijvenbode-WWF/ForestForesigh
 AWS_BUCKET_NAME: "forestforesight-public"
 AWS_BUCKET_REGION: "eu-west-1"
 EARLIEST_DATA_DATE: "2021-01-01"
-DEFAULT_GROUNDTRUTH: "groundtruth6m"
+DEFAULT_GROUNDTRUTH: "groundtruth3m"
 DATA_FOLDER: "C:/Kodingan3/FFdatas"
 TEST:
   DATA_FOLDER: "tests/test_data"
