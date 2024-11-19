@@ -9,7 +9,7 @@ config_load <- function() {
     load_vars(config_file)
 
     # user_config_file is used by users to replace or supplement default configuration
-    user_config_file <- here::here("config.yml") 
+    user_config_file <- here::here("config.yml")
     if (file.exists(user_config_file)) { # optionally load the user config_file
       load_vars(user_config_file)
     }
