@@ -16,14 +16,14 @@ config_load <- function() {
   } else {
     warning("The env config file does not exist. Please check the file path.")
     warning(config_file)
-    # rcmdcheck test
-    config_file <- here::here("../../env.yml")
-    if (file.exists(config_file)) {
-      load_vars(config_file)
-    } else {
-      warning("The env config file REALLY doesn't exist. Please check the file path.")
-      warning(config_file)
-    }
+    # # rcmdcheck test
+    # config_file <- here::here("../../env.yml")
+    # if (file.exists(config_file)) {
+    #   load_vars(config_file)
+    # } else {
+    #   warning("The env config file REALLY doesn't exist. Please check the file path.")
+    #   warning(config_file)
+    # }
   }
 }
 
