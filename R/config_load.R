@@ -21,8 +21,9 @@ config_load <- function() {
     if (file.exists(config_file)) {
       load_vars(config_file)
     } else {
-    warning("The env config file REALLY doesn't exist. Please check the file path.")
-    warning(config_file)
+      warning("The env config file REALLY doesn't exist. Please check the file path.")
+      warning(config_file)
+    }
   }
 }
 
