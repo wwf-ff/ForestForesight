@@ -44,7 +44,7 @@ jobs:
       - name: Session info
         run: sessionInfo()
         shell: Rscript {0}
-
+      
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual --no-tests", error_on = "error")
+        run: rcmdcheck::rcmdcheck(args = "--no-manual ", error_on = "error")
         shell: Rscript {0}
