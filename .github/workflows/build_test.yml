@@ -32,7 +32,7 @@ jobs:
           install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
-
+      
       - name: Delete NAMESPACE
         run: |
           if [ -f NAMESPACE ]; then rm NAMESPACE; fi
@@ -41,7 +41,10 @@ jobs:
         run: |
           Rscript -e "roxygen2::roxygenise()"
 
-      - name: Run R CMD check
-        run: |
-          R CMD build .
-          R CMD check *tar.gz --as-cran
+      - name: Session info
+        run: sessionInfo()
+        shell: Rscript {0}
+
+      - name: Check
+        run: rcmdcheck::rcmdcheck(args = "--no-manual --no-tests", error_on = "error")
+        shell: Rscript {0}
