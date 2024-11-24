@@ -1,5 +1,4 @@
 config_load <- function() {
-
   # Locate env.yml (the default configurations)
   config_file <- here::here("tests/testthat/env.yml")
 
