@@ -13,7 +13,6 @@ if (!file.exists(config_file)) { # this would be the case of rcmdcheck in Github
   if (file.exists(source_file)) { # this would be the case of rcmdcheck in Github pipeline
     # Define the destination file path in the current directory
     destination_file <- file.path(".", "env.yml")
-
     # Copy the file from the source path to the destination path
     # file.copy(source_file, destination_file, overwrite = TRUE)
     success <- file.copy(source_file, config_file, overwrite = TRUE)
@@ -23,6 +22,8 @@ if (!file.exists(config_file)) { # this would be the case of rcmdcheck in Github
     } else {
       print("File copy failed.")
     }
+  } else {
+    warning("The source_file env.yml doesn't exist")
   }
 }
 config_load()
