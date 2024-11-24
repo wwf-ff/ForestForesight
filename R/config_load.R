@@ -22,7 +22,6 @@ config_load <- function() {
       warning("The env config file does not exist. Please check the file path.")
       warning(config_file)
     }
-
   }
 }
 
