@@ -6,6 +6,7 @@ test_that("refactored ff_prep has the same output as the original", {
   features <- c("initialforestcover", "lastsixmonths", "timesinceloss")
   current_directory <- here::here()
   if (grepl("testthat", current_directory, fixed = TRUE)) {
+    print("==== here starts in testthat")
     # here() starts at testthat, modify the download_folder
     download_folder <- paste0("../../", download_folder)
   } 
