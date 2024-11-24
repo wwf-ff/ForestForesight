@@ -164,7 +164,7 @@ ff_prep_refactored <- function(datafolder = NA, country = NA, shape = NA, tiles 
 check_pre_conditions <- function(dates, country, shape, tiles, shrink, inc_features, exc_features, verbose, datafolder) {
   ff_cat("Checking ff_prep function input", verbose = verbose)
   if (!hasvalue(datafolder)) {
-    stop("no environment variable for DATA_FOLDER found and no other option given")
+    stop("no environment variable for datafolder found and no other option given")
   }
   # Check date validity
   if (!hasvalue(dates) || any(is.na(dates)) || dates == "") {

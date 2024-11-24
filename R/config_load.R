@@ -3,9 +3,9 @@ config_load <- function() {
   library(here)
 
   # Locate env.yml (the default configurations)
-  config_file <- here::here("env.yml")
+  config_file <- here::here("tests/testthat/env.yml")
 
-  if (file.exists(config_file)) {
+  if (file.exists(config_file)) { # non rcmdcheck use cases: package, source code, normal unittests
     load_vars(config_file)
 
     # user_config_file is used by users to replace or supplement default configuration
@@ -13,17 +13,16 @@ config_load <- function() {
     if (file.exists(user_config_file)) { # optionally load the user config_file
       load_vars(user_config_file)
     }
-  } else {
-    warning("The env config file does not exist. Please check the file path.")
-    warning(config_file)
-    # # rcmdcheck test
-    # config_file <- here::here("../../env.yml")
-    # if (file.exists(config_file)) {
-    #   load_vars(config_file)
-    # } else {
-    #   warning("The env config file REALLY doesn't exist. Please check the file path.")
-    #   warning(config_file)
-    # }
+  } else { # rcmdcheck case or env.yml is missing
+    print("=========== rcmdcheck ?? =======")
+    config_file <- here::here("env.yml") # rcmdcheck working directory is in testthat
+    if (file.exists(config_file)) {
+      load_vars(config_file)
+    } else {
+      warning("The env config file does not exist. Please check the file path.")
+      warning(config_file)
+    }
+
   }
 }
 
