@@ -17,11 +17,11 @@ if (!file.exists(config_file)) { # this would be the case of rcmdcheck in Github
     # Copy the file from the source path to the destination path
     # file.copy(source_file, destination_file, overwrite = TRUE)
     success <- file.copy(source_file, config_file, overwrite = TRUE)
-    if (success && file.exists(config_file)) { 
+    if (success && file.exists(config_file)) {
       # Print a message indicating the copy was successful
       cat("env.yml has been successfully copied to testthat directory.\n")
-    } else { 
-      print("File copy failed.") 
+    } else {
+      print("File copy failed.")
     }
   }
 }
