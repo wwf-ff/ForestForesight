@@ -8,7 +8,7 @@ test_that("refactored ff_prep has the same output as the original", {
   if (grepl("testthat", current_directory, fixed = TRUE)) {
     # here() starts at testthat, modify the download_folder
     download_folder <- paste0("../../", download_folder)
-  } 
+  }
   data_folder <- paste(download_folder, "preprocessed", sep = "/")
 
   # sample_size=1 in order to remove randomness
