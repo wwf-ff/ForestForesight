@@ -221,6 +221,10 @@ get_tiles_and_shape <- function(country, shape, tiles_vector, tiles, verbose) {
 list_and_filter_tile_files <- function(datafolder = NA, tiles, groundtruth_pattern, verbose) {
   input_datafolder <- file.path(datafolder, "preprocessed", "input")
   groundtruth_datafolder <- file.path(datafolder, "preprocessed", "groundtruth")
+  print("====input data folder: ")
+  print(input_datafolder)
+  print("groundtruth data folder: ")
+  print(groundtruth_datafolder)
 
 
   ff_cat("Searching", input_datafolder, "for tiles", paste(tiles, collapse = ", "), verbose = verbose)
