@@ -6,7 +6,7 @@ test_that("refactored ff_prep has the same output as the original", {
   features <- c("initialforestcover", "lastsixmonths", "timesinceloss")
   download_folder <- test_path(download_folder)
   data_folder <- paste(download_folder, "preprocessed", sep = "/")
-  
+
   # sample_size=1 in order to remove randomness
   # running on tiles
   tiles <- c("10N_110E")
