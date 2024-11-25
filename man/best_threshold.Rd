@@ -40,4 +40,6 @@ This function finds the best threshold for a given prediction function by maximi
 }
 \examples{
 best_threshold(c(0.2, 0.6, 0.7), c(0, 1, 1))
+
+importFrom getFScore
 }

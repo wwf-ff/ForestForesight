@@ -5,7 +5,7 @@
 \title{Prepare data for XGBoost training, validating and predicting}
 \usage{
 ff_prep_refactored(
-  datafolder = Sys.getenv("DATA_FOLDER"),
+  datafolder = NA,
   country = NA,
   shape = NA,
   tiles = NULL,
