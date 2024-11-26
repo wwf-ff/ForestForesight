@@ -29,6 +29,7 @@ jobs:
 
       - name: Install R dependencies
         run: |
+          install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       
