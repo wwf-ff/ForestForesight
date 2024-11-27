@@ -19,14 +19,27 @@ jobs:
     - name: Set up renv
       uses: r-lib/actions/setup-renv@v2
 
-    - name: Install system dependencies
+    - name: Install comprehensive system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
           libcurl4-openssl-dev \
           libxml2-dev \
           libssl-dev \
-          libudunits2-dev  # Added this line for udunits2 support
+          libudunits2-0 \
+          libudunits2-dev \
+          proj-bin \
+          libproj-dev \
+          libgdal-dev \
+          libgeos-dev \
+          libnetcdf-dev
+
+    - name: Diagnostic System Library Check
+      run: |
+        echo "Checking udunits2 library"
+        ldconfig -p | grep udunits
+        echo "R library path:"
+        Rscript -e '.libPaths()'
 
     - name: Style R code
       run: |
