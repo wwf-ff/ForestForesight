@@ -27,16 +27,14 @@ jobs:
           sudo apt-get install -y libudunits2-dev libgdal-dev libgeos-dev libproj-dev
           sudo apt-get install -y pkg-config texlive-latex-extra texlive-fonts-extra
 
-      - name: Install R dependencies
-        run: |
-          install.packages("remotes")
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
-      
-      - name: Delete NAMESPACE
-        run: |
-          if [ -f NAMESPACE ]; then rm NAMESPACE; fi
 
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
+    
+      - name: Install package
+        run: |
+          Rscript -e 'devtools::install()'
+    
       - name: Regenerate documentation
         run: |
           Rscript -e "roxygen2::roxygenise()"
