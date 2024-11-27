@@ -14,9 +14,8 @@
 #' @examples
 #' best_threshold(c(0.2, 0.6, 0.7), c(0, 1, 1))
 #'
-#' importFrom getFScore
 #' @export
-best_threshold <- function(prediction, groundtruth, optimize_function = getFscore,
+best_threshold <- function(prediction, groundtruth, optimize_function = get_f_score(),
                            a = 0.45, b = 0.55, tol = 0.001, maxiter = 100, beta = 0.5) {
   # Golden ratio
   phi <- (1 + sqrt(5)) / 2
