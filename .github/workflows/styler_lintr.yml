@@ -1,7 +1,8 @@
 name: Improving Readability
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: 
+      - "develop"
 
 jobs:
   styling-linting-the-code:

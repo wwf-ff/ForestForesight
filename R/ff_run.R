@@ -17,10 +17,10 @@
 #' If NULL, a new model will be trained. Default is NULL.
 #' @param ff_prep_params List of parameters for data preprocessing. See `ff_prep` function for details.
 #' @param ff_train_params List of parameters for model training. See `ff_train` function for details.
-#' @param threshold Probability threshold for binary classififf_cation. Default is 0.5.
-#' @param fltr_features Feature dataset used for pre-filtering for training.
+#' @param threshold Probability threshold for binary classification. Default is 0.5.
+#' @param filter_features Feature dataset used for pre-filtering for training.
 #' Default is initialforestcover. Can be more than one
-#' @param fltr_condition The condition with value that is used to filter the training dataset based on mask features.
+#' @param filter_conditions The condition with value that is used to filter the training dataset based on mask features.
 #'  Default is ">0". Can be more than one
 #' @param accuracy_csv Path to save accuracy metrics in CSV format. Default is NA (no CSV output).
 #' @param importance_csv Path to save feature importance metrics in CSV format. Default is NA (no CSV output).
@@ -49,7 +49,7 @@
 #' plot(prediction)
 #' }
 #'
-#' @importFrom lubridate ymd months %m-%
+#' @importFrom lubridate ymd %m-%
 #' @importFrom terra project mask crop vect merge
 #' @export
 #'
@@ -75,8 +75,8 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
                    ff_prep_params = NULL,
                    ff_train_params = NULL,
                    threshold = 0.5,
-                   fltr_features = "initialforestcover",
-                   fltr_condition = ">0",
+                   filter_features = "initialforestcover",
+                   filter_conditions = ">0",
                    accuracy_csv = NULL,
                    importance_csv = NA,
                    verbose = TRUE,
@@ -84,14 +84,21 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
                    validation = FALSE) {
   fixed_sample_size <- 6e6
   sample_size <- 0.3
+
   if (!hasvalue(shape) && !hasvalue(country)) {
     stop("either input shape or country should be given")
+  }
+  if (hasvalue(shape)) {
+    ForestForesight::check_spatvector(shape,
+      check_size = hasvalue(train_dates)
+    )
   }
   if (!hasvalue(shape)) {
     data(countries, envir = environment())
     countries <- terra::vect(countries)
     shape <- countries[which(countries$iso3 == country), ]
   }
+
   # check if all the function parameters have values in the right format
   if (hasvalue(validation_dates)) {
     validation <- FALSE
@@ -112,29 +119,46 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
 
   if (is.null(trained_model)) {
     if (!hasvalue(train_dates)) {
-      train_dates <- as.character(lubridate::ymd(min(prediction_dates)) %m-% months(6, abbreviate = FALSE))
+      ff_cat("No train dates were given though a training was wanted")
+      # Extract the number of months from groundtruth_pattern (e.g., "6" from "groundtruth6m")
+      months_back <- as.integer(gsub("\\D", "", groundtruth_pattern))
+
+      # Fallback to 6 months if pattern is invalid or missing
+      if (is.na(months_back) || months_back <= 0) {
+        months_back <- 6
+        warning("Invalid or missing groundtruth_pattern. Defaulting to 6 months.")
+      }
+
+      train_dates <- as.character(
+        lubridate::ymd(min(prediction_dates)) %m-%
+          months(months_back, abbreviate = FALSE)
+      )
+      ff_cat("No train dates were given though a training was wanted, model will be trained on",
+        train_dates,
+        color = "yellow"
+      )
     }
 
-    if (lubridate::ymd(max(train_dates)) > lubridate::ymd(prediction_dates[1])) {
+    if (max(lubridate::ymd(train_dates)) > min(lubridate::ymd(prediction_dates))) {
       ff_cat("(some) training dates are after prediction dates", color = "yellow")
     }
-    if ((lubridate::ymd(prediction_dates[1]) - lubridate::ymd(max(train_dates))) < 170) {
+    if ((min(lubridate::ymd(prediction_dates)) - max(lubridate::ymd(train_dates))) < 170) {
       ff_cat("There should be at least 6 months between training and testing/predicting", color = "yellow")
     }
   }
 
 
-  if (!terra::is.lonlat(shape)) {
-    shape <- terra::project(shape, "epsg:4326")
-  }
-  data(gfw_tiles, envir = environment())
-  tiles <- terra::vect(gfw_tiles)[shape, ]$tile_id
-
-
-  prep_folder <- file.path(ff_folder, "preprocessed")
-  if (!dir.exists(prep_folder)) {
-    stop(paste(prep_folder, "does not exist"))
-  }
+  tiles <- terra::vect(get(data("gfw_tiles", envir = environment())))[shape, ]$tile_id
+  shape <- check_spatvector(shape)
+  ff_structurecheck(
+    shape = shape, folder_path = ff_folder,
+    check_date = if (hasvalue(train_dates)) {
+      train_dates[1]
+    } else {
+      prediction_dates[1]
+    },
+    error_on_issue = TRUE, silent_on_pass = TRUE
+  )
 
 
 
@@ -142,47 +166,41 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
   if (is.null(trained_model)) {
     sample_size <- 0.3
     # ff prep to determine the sample size
-    if (autoscale_sample && hasvalue(fltr_condition)) {
-      if (verbose) {
-        ff_cat("Finding optimal sample size based on filter condition\n", color = "green")
-      }
+    if (autoscale_sample && hasvalue(filter_conditions)) {
+      ff_cat("Finding optimal sample size based on filter conditions", color = "green", verbose = verbose)
       ff_prep_params_original <- list(
-        datafolder = prep_folder, shape = shape, dates = train_dates,
-        fltr_condition = fltr_condition, fltr_features = fltr_features,
+        datafolder = ff_folder, shape = shape, dates = train_dates,
+        filter_conditions = filter_conditions, filter_features = filter_features,
         sample_size = 1, shrink = "extract",
-        groundtruth_pattern = "groundtruth6m", label_threshold = 1
+        groundtruth_pattern = Sys.getenv("DEFAULT_GROUNDTRUTH"), label_threshold = 1
       )
       ff_prep_params_combined <- merge_lists(default = ff_prep_params_original, user = ff_prep_params)
       ff_prep_params_combined <- merge_lists(
         default = ff_prep_params_combined,
         user = list(
-          "inc_features" = fltr_features, "adddate" = FALSE,
-          "addxy" = FALSE, "verbose" = FALSE
+          "inc_features" = filter_features, "add_date" = FALSE,
+          "add_xy" = FALSE, "verbose" = FALSE
         )
       )
       traindata <- do.call(ff_prep, ff_prep_params_combined)
       if (validation) {
-        sample_size <- min(1, 1.33 * fixed_sample_size / length(traindata$data_matrix$features))
+        sample_size <- min(1, 1.33 * fixed_sample_size / length(traindata$feature_dataset$features))
 
         ff_cat("adding validation matrix", color = "green", verbose = verbose)
       } else {
-        sample_size <- min(1, fixed_sample_size / length(traindata$data_matrix$features))
+        sample_size <- min(1, fixed_sample_size / length(traindata$feature_dataset$features))
       }
 
-      ff_cat("autoscaled sample size:", round(sample_size, 2), color = "green", verbose = verbose)
+      ff_cat("Autoscaled sample size:", round(sample_size, 2), color = "green", verbose = verbose)
     }
 
-
-
-
-    ff_cat("Preparing data", color = "green", verbose = verbose)
-    ff_cat("looking in folder", prep_folder, verbose = verbose, color = "green")
+    ff_cat("Preparing data\nLooking in folder", ff_folder, verbose = verbose, color = "green")
 
     ff_prep_params_original <- list(
-      datafolder = prep_folder, shape = shape, dates = train_dates,
-      fltr_condition = fltr_condition, fltr_features = fltr_features,
+      datafolder = ff_folder, shape = shape, dates = train_dates,
+      filter_conditions = filter_conditions, filter_features = filter_features,
       sample_size = sample_size, verbose = verbose, shrink = "extract",
-      groundtruth_pattern = "groundtruth6m", label_threshold = 1
+      groundtruth_pattern = Sys.getenv("DEFAULT_GROUNDTRUTH"), label_threshold = 1
     )
     if (validation) {
       ff_prep_params_original <- c(ff_prep_params_original, list("validation_sample" = 0.25))
@@ -191,7 +209,9 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
 
     traindata <- do.call(ff_prep, ff_prep_params_combined)
     if (hasvalue(validation_dates)) {
-      ff_cat("adding validation matrix for dates", paste(validation_dates, collapse = ", "), "\n", color = "green", verbose = verbose)
+      ff_cat("adding validation matrix for dates", paste(validation_dates, collapse = ", "), "\n",
+        color = "green", verbose = verbose
+      )
 
       ff_prep_params_combined["dates"] <- validation_dates
       ff_prep_params_combined["sample_size"] <- 1 / 3 * sample_size
@@ -202,20 +222,20 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
         extra_features <- which(!valdata$features %in% traindata$features)
         if (length(extra_features) > 0) {
           valdata$features <- valdata$features[-extra_features]
-          valdata$data_matrix$features <- valdata$data_matrix$features[, -extra_features]
+          valdata$feature_dataset$features <- valdata$feature_dataset$features[, -extra_features]
         }
       } else {
         extra_features <- which(!traindata$features %in% valdata$features)
         if (length(extra_features) > 0) {
           traindata$features <- traindata$features[-extra_features]
-          traindata$data_matrix$features <- traindata$data_matrix$features[, -extra_features]
+          traindata$feature_dataset$features <- traindata$feature_dataset$features[, -extra_features]
         }
       }
-      traindata$validation_matrix <- valdata$data_matrix
+      traindata$validation_matrix <- valdata$feature_dataset
     }
 
     ff_train_params_original <- list(
-      train_matrix = traindata$data_matrix, verbose = verbose,
+      train_matrix = traindata$feature_dataset, verbose = verbose,
       modelfilename = save_path
     )
     if (validation || hasvalue(validation_dates)) {
@@ -242,10 +262,10 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
     for (tile in tiles) {
       # run the predict function if a model was not built but was provided by the function
       ff_prep_params_original <- list(
-        datafolder = prep_folder, tiles = tile, dates = prediction_date,
-        verbose = verbose, fltr_features = fltr_features,
-        fltr_condition = fltr_condition, groundtruth_pattern = "groundtruth6m",
-        sample_size = 1, label_threshold = 1, shrink = "crop"
+        datafolder = ff_folder, tiles = tile, dates = prediction_date,
+        verbose = verbose, filter_features = filter_features,
+        filter_conditions = filter_conditions, groundtruth_pattern = Sys.getenv("DEFAULT_GROUNDTRUTH"),
+        sample_size = 1, label_threshold = 1, shrink = "none"
       )
       ff_prep_params_combined <- merge_lists(ff_prep_params_original, ff_prep_params)
       if (class(trained_model) == "character") {
@@ -263,25 +283,25 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
       predset <- do.call(ff_prep, ff_prep_params_combined)
 
       prediction <- ff_predict(
-        model = trained_model, test_matrix = predset$data_matrix,
-        indices = predset$testindices,
-        templateraster = predset$groundtruthraster,
+        model = trained_model, test_matrix = predset$feature_dataset,
+        indices = predset$test_indices,
+        templateraster = predset$groundtruth_raster,
         verbose = verbose, certainty = TRUE
       )
       raslist[[tile]] <- prediction$predicted_raster
       # Analyze prediction
-      for (i in seq_along(fltr_features)) {
+      for (i in seq_along(filter_features)) {
         filename <- get_raster(
           tile = tile, date = prediction_date,
-          datafolder = paste0(prep_folder, "/input/"),
-          feature = fltr_features[i]
+          datafolder = file.path(ff_folder, "preprocessed", "input"),
+          feature = filter_features[i]
         )
         if (!hasvalue(filename)) {
-          stop(paste("Cannot find the file for feature", fltr_features[i]))
+          stop(paste("Cannot find the file for feature", filter_features[i]))
         }
         curras <- terra::rast(filename)
-        operator <- gsub("[[:alnum:]]", "", fltr_condition[i])
-        value <- as.numeric(gsub("[^0-9.-]", "", fltr_condition[i]))
+        operator <- gsub("[[:alnum:]]", "", filter_conditions[i])
+        value <- as.numeric(gsub("[^0-9.-]", "", filter_conditions[i]))
         curras <- switch(operator,
           ">" = curras > value,
           "<" = curras < value,
@@ -299,10 +319,10 @@ ff_run <- function(shape = NULL, country = NULL, prediction_dates = NULL,
       if (!hasvalue(forestras)) {
         forestras <- NULL
       }
-      if (predset$hasgroundtruth) {
+      if (predset$has_groundtruth) {
         analysis_polygons <- terra::intersect(terra::vect(get(data("degree_polygons"))), terra::aggregate(shape))
         pols <- ff_analyze(prediction$predicted_raster > threshold,
-          groundtruth = predset$groundtruthraster,
+          groundtruth = predset$groundtruth_raster,
           csvfile = accuracy_csv, tile = tile, date = prediction_date,
           return_polygons = verbose, append = TRUE, country = country,
           verbose = verbose, forestmask = forestras, analysis_polygons = analysis_polygons
