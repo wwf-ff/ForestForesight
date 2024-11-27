@@ -25,8 +25,8 @@ find_best_threshold <- function(prediction, groundtruth, optimize_function = get
   # Initialize variables
   x1 <- b - inv_phi * (b - a)
   x2 <- a + inv_phi * (b - a)
-  f1 <- optimize_function(groundtruth, prediction, x1, beta)
-  f2 <- optimize_function(groundtruth, prediction, x2, beta)
+  f1 <- optimize_function(gt = groundtruth, prediction, x1, beta)
+  f2 <- optimize_function(gt = groundtruth, prediction, x2, beta)
 
   # Iteration loop
   for (i in 1:maxiter) {
