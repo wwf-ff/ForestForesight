@@ -5,9 +5,6 @@
 #' @param raster path to raster.
 #' @param return_values Should the values of the rasters also be returned.
 #'
-#' @examples
-#' # Example usage:
-#' result <- process_tif_files("path/to/tif_file")
 #'
 #' @export
 #'
