@@ -690,7 +690,7 @@
       "Package": "httpuv",
       "Version": "1.6.15",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "R6",
@@ -784,12 +784,12 @@
       "Package": "later",
       "Version": "1.4.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "Rcpp",
         "rlang"
       ],
-      "Hash": "a3e051d405326b8b0012377434c62b37"
+      "Hash": "dd8a8b6833989ba10fba1bf1ee7d3860"
     },
     "lattice": {
       "Package": "lattice",
