@@ -31,15 +31,12 @@ jobs:
           libgeos-dev \
           libnetcdf-dev
 
-    - name: Diagnostic System Library Check
-      run: |
-        echo "Checking udunits2 library"
-        ldconfig -p | grep udunits
-        echo "R library path:"
-        Rscript -e '.libPaths()'
-
     - name: Set up renv
       uses: r-lib/actions/setup-renv@v2
+
+    - name: Run unit tests
+      run: |
+        Rscript -e 'library(testthat); test_dir("tests")'
 
     - name: Style R code
       run: |
