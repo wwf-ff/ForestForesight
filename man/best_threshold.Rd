@@ -7,7 +7,7 @@
 best_threshold(
   prediction,
   groundtruth,
-  optimize_function = getFscore,
+  optimize_function = get_f_score(),
   a = 0.45,
   b = 0.55,
   tol = 0.001,
@@ -41,5 +41,4 @@ This function finds the best threshold for a given prediction function by maximi
 \examples{
 best_threshold(c(0.2, 0.6, 0.7), c(0, 1, 1))
 
-importFrom getFScore
 }
