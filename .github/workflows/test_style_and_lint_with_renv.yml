@@ -16,9 +16,6 @@ jobs:
       with:
         r-version: 'release'
 
-    - name: Set up renv
-      uses: r-lib/actions/setup-renv@v2
-
     - name: Install comprehensive system dependencies
       run: |
         sudo apt-get update
@@ -40,6 +37,9 @@ jobs:
         ldconfig -p | grep udunits
         echo "R library path:"
         Rscript -e '.libPaths()'
+
+    - name: Set up renv
+      uses: r-lib/actions/setup-renv@v2
 
     - name: Style R code
       run: |
