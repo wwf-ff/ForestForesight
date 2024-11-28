@@ -21,6 +21,7 @@
 #' feature <- "initialforestcover"
 #' tile <- "00N_070W"
 #' get_raster(datafolder, date, feature, tile)
+#' }
 #' # Returns: Vector of file paths to selected raster files.
 get_raster <- function(datafolder, date, feature, tile = NULL, shape = NULL, return_raster = FALSE, verbose = FALSE) {
   if ((hasvalue(tile) + hasvalue(shape)) != 1) {
