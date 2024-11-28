@@ -48,20 +48,25 @@ jobs:
 
       - name: Session info
         run: sessionInfo()
-        shell: Rscript {0}
-      
+        shell: Rscript {0}      
+
       - name: Check
         run: |
-          tryCatch({
-            result <- rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "never")
+          check_result <- devtools::check(args = c("--no-manual", "--as-cran"))
+      
+          if (!is.null(check_result$errors)) {
             cat("Errors:\n")
-            print(result$errors)
+            print(check_result$errors)
+          }
+      
+          if (!is.null(check_result$warnings)) {
             cat("Warnings:\n")
-            print(result$warnings)
+            print(check_result$warnings)
+          }
+      
+          if (!is.null(check_result$notes)) {
             cat("Notes:\n")
-            print(result$notes)
-          }, error = function(e) {
-            cat("An error occurred during rcmdcheck:\n")
-            print(e)
-          })
+            print(check_result$notes)
+          }
+      
         shell: Rscript {0}
