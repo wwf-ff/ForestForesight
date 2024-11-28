@@ -22,10 +22,11 @@ A list containing the filtered matrix and the indices of the filtered rows.
 This function filters a matrix based on specified features and conditions.
 }
 \examples{
+\dontrun{
 filter_by_feature(
   filter_features = c("landpercentage", "forestmask"),
   filter_conditions = c(">100", ">0"),
   matrix = my_matrix
 )
-
+}
 }

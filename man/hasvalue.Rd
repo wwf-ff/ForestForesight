@@ -2,7 +2,8 @@
 % Please edit documentation in R/hasvalue.R
 \name{hasvalue}
 \alias{hasvalue}
-\title{Check if an object has a value and is not NULL or NA}
+\title{Check if an object has a value and is not NULL or NA
+This function checks whether an object is not NULL or NA.}
 \usage{
 hasvalue(x)
 }
@@ -10,15 +11,17 @@ hasvalue(x)
 \item{x}{An R object to be tested.}
 }
 \value{
-TRUE if the object is not NULL or NA, else FALSE. returns TRUE if it is a vector of multiple NA's
+TRUE if the object is not NULL or NA, else FALSE. Returns TRUE if it is a vector of multiple NA's.
 }
 \description{
+Check if an object has a value and is not NULL or NA
 This function checks whether an object is not NULL or NA.
 }
 \examples{
+\dontrun{
 # Test with a vector containing NA values
 hasvalue(c(1, 2, NA, 4))
 # Test with a NULL object
 hasvalue(NULL)
-
+}
 }

@@ -11,9 +11,6 @@
 #' @param return_raster Logical. Whether it should return the (mosaiced) raster instead of just the file names.
 #' @param verbose Logical. Whether print statements should be output.
 #' @return A character vector containing the file paths of the selected raster files.
-
-
-#' @export
 #' @examples
 #' \dontrun{
 #' datafolder <- "/path/to/data"
@@ -23,6 +20,7 @@
 #' get_raster(datafolder, date, feature, tile)
 #' }
 #' # Returns: Vector of file paths to selected raster files.
+#' @export
 get_raster <- function(datafolder, date, feature, tile = NULL, shape = NULL, return_raster = FALSE, verbose = FALSE) {
   if ((hasvalue(tile) + hasvalue(shape)) != 1) {
     stop("either a tile or a shape should be given")
