@@ -11,7 +11,6 @@
 #' }
 #' @export
 hasvalue <- function(x) {
-
   if (length(x) > 1) {
     return(TRUE)
   }
@@ -28,7 +27,7 @@ hasvalue <- function(x) {
 
   if (class(x) == "character") {
     if (length(x) == 0) {
-    return(FALSE)
+      return(FALSE)
     }
     if (x == "") {
       return(FALSE)
@@ -36,5 +35,4 @@ hasvalue <- function(x) {
   }
 
   return(TRUE)
-
 }
