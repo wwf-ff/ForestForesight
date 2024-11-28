@@ -48,11 +48,12 @@ jobs:
 
       - name: Session info
         run: sessionInfo()
-        shell: Rscript {0}      
+        shell: Rscript {0}
+      
 
       - name: Check
         run: |
-          check_result <- devtools::check(args = c("--no-manual", "--as-cran"))
+          check_result <- devtools::check(args = c("--no-manual", "--as-cran"), error_on = "never")
       
           if (!is.null(check_result$errors)) {
             cat("Errors:\n")
