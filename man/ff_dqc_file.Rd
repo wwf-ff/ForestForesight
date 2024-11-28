@@ -4,7 +4,7 @@
 \alias{ff_dqc_file}
 \title{summary data aspects of a raster}
 \usage{
-ff_dqc_file(raster, return_values = T)
+ff_dqc_file(raster, return_values = TRUE)
 }
 \arguments{
 \item{raster}{path to raster.}
@@ -13,9 +13,4 @@ ff_dqc_file(raster, return_values = T)
 }
 \description{
 requires a path to a raster as input and gives some quality parameters of that file
-}
-\examples{
-# Example usage:
-result <- process_tif_files("path/to/tif_file")
-
 }

@@ -10,12 +10,13 @@ get_raster(
   feature,
   tile = NULL,
   shape = NULL,
-  return_raster = F,
-  verbose = F
+  return_raster = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
-\item{datafolder}{A character string specifying the path to the data folder where raster files are stored.This should be in the preprocessed folder of Forest Foresight.}
+\item{datafolder}{A character string specifying the path to the data folder where raster files are stored.
+This should be in the preprocessed folder of Forest Foresight.}
 
 \item{date}{A Date object representing the date for which raster files are to be retrieved.}
 
@@ -36,10 +37,12 @@ A character vector containing the file paths of the selected raster files.
 This function retrieves raster files from a specified data folder based on the given date, feature, and tile pattern.
 }
 \examples{
+\dontrun{
 datafolder <- "/path/to/data"
 date <- as.Date("2022-01-01")
 feature <- "initialforestcover"
 tile <- "00N_070W"
 get_raster(datafolder, date, feature, tile)
+}
 # Returns: Vector of file paths to selected raster files.
 }
