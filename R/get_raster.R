@@ -15,6 +15,7 @@
 
 #' @export
 #' @examples
+#'\dontrun{
 #' datafolder <- "/path/to/data"
 #' date <- as.Date("2022-01-01")
 #' feature <- "initialforestcover"
